@@ -1,107 +1,65 @@
-import React from 'react'
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import { MdAddShoppingCart } from 'react-icons/md'
 
 import { ProductList } from './styles'
 
-export default function Home () {
-  return (
-    <ProductList>
-      <li>
-        <img
-          src="https://static.netshoes.com.br/produtos/tenis-vr-caminhada-confortavel-detalhes-couro-masculino/04/E74-0413-304/E74-0413-304_detalhe2.jpg?resize=326:*"
-          alt="Tênis"
-        />
-        <strong>Tênis Preto</strong>
-        <span>R$129,90</span>
+import api from '../../services/api'
+import { formatPrice } from '../../util/format'
 
-        <button type="button">
-          <div>
-            <MdAddShoppingCart size={16} color={'#fff'} /> 3
-          </div>
+class Home extends Component {
+  state = {
+    products: []
+  }
 
-          <span>ADICIONAR AO CARRINHO</span>
-        </button>
-      </li>
-      <li>
-        <img
-          src="https://static.netshoes.com.br/produtos/tenis-vr-caminhada-confortavel-detalhes-couro-masculino/04/E74-0413-304/E74-0413-304_detalhe2.jpg?resize=326:*"
-          alt="Tênis"
-        />
-        <strong>Tênis Preto</strong>
-        <span>R$129,90</span>
+  async componentDidMount() {
+    //Busca dados da API
+    const response = await api.get('/products')
 
-        <button type="button">
-          <div>
-            <MdAddShoppingCart size={16} color={'#fff'} /> 3
-          </div>
+    //Mapeia o array da resposta da API e formata os preços
+    //em um novo atributo (priceFormatted)
+    const data = response.data.map(product => ({
+      ...product,
+      priceFormatted: formatPrice(product.price)
+    }))
 
-          <span>ADICIONAR AO CARRINHO</span>
-        </button>
-      </li>
-      <li>
-        <img
-          src="https://static.netshoes.com.br/produtos/tenis-vr-caminhada-confortavel-detalhes-couro-masculino/04/E74-0413-304/E74-0413-304_detalhe2.jpg?resize=326:*"
-          alt="Tênis"
-        />
-        <strong>Tênis Preto</strong>
-        <span>R$129,90</span>
+    this.setState({ products: data })
+  }
 
-        <button type="button">
-          <div>
-            <MdAddShoppingCart size={16} color={'#fff'} /> 3
-          </div>
+  handleAddProduct = product => {
+    const { dispatch } = this.props
 
-          <span>ADICIONAR AO CARRINHO</span>
-        </button>
-      </li>
-      <li>
-        <img
-          src="https://static.netshoes.com.br/produtos/tenis-vr-caminhada-confortavel-detalhes-couro-masculino/04/E74-0413-304/E74-0413-304_detalhe2.jpg?resize=326:*"
-          alt="Tênis"
-        />
-        <strong>Tênis Preto</strong>
-        <span>R$129,90</span>
+    dispatch({
+      type: 'ADD_TO_CART',
+      product
+    })
+  }
 
-        <button type="button">
-          <div>
-            <MdAddShoppingCart size={16} color={'#fff'} /> 3
-          </div>
+  render() {
+    const { products } = this.state
+    return (
+      <ProductList>
+        {products.map(product => (
+          <li key={product.id}>
+            <img src={product.image} alt={products.title} />
+            <strong>{product.title}</strong>
+            <span>{product.priceFormatted}</span>
 
-          <span>ADICIONAR AO CARRINHO</span>
-        </button>
-      </li>
-      <li>
-        <img
-          src="https://static.netshoes.com.br/produtos/tenis-vr-caminhada-confortavel-detalhes-couro-masculino/04/E74-0413-304/E74-0413-304_detalhe2.jpg?resize=326:*"
-          alt="Tênis"
-        />
-        <strong>Tênis Preto</strong>
-        <span>R$129,90</span>
+            <button
+              type="button"
+              onClick={() => this.handleAddProduct(product)}
+            >
+              <div>
+                <MdAddShoppingCart size={16} color={'#fff'} /> 3
+              </div>
 
-        <button type="button">
-          <div>
-            <MdAddShoppingCart size={16} color={'#fff'} /> 3
-          </div>
-
-          <span>ADICIONAR AO CARRINHO</span>
-        </button>
-      </li>
-      <li>
-        <img
-          src="https://static.netshoes.com.br/produtos/tenis-vr-caminhada-confortavel-detalhes-couro-masculino/04/E74-0413-304/E74-0413-304_detalhe2.jpg?resize=326:*"
-          alt="Tênis"
-        />
-        <strong>Tênis Preto</strong>
-        <span>R$129,90</span>
-
-        <button type="button">
-          <div>
-            <MdAddShoppingCart size={16} color={'#fff'} /> 3
-          </div>
-
-          <span>ADICIONAR AO CARRINHO</span>
-        </button>
-      </li>
-    </ProductList>
-  )
+              <span>ADICIONAR AO CARRINHO</span>
+            </button>
+          </li>
+        ))}
+      </ProductList>
+    )
+  }
 }
+
+export default connect()(Home)
