@@ -1,0 +1,26 @@
+
+version: '3'
+services:
+  frontend:
+    container_name: shoes-store-react-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3000"
+    networks:
+      - main-network
+
+  backend:
+    container_name: shoes-json-server
+    build:
+      context: ./server
+      dockerfile: ./Dockerfile
+    ports:
+      - "3003:3001"
+    networks:
+      - main-network
+
+networks:
+  main-network:
+    driver: bridge
